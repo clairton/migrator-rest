@@ -20,6 +20,7 @@ public class MigratorController implements Serializable {
 
 	@Patch("")
 	public void run() {
+
 		result.use(status()).ok();
 	}
 

@@ -1,5 +1,6 @@
 package br.eti.clairton.migrator.rest;
 
+import static br.eti.clairton.migrator.rest.Utils.removeFileName;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Logger.getLogger;
 
@@ -34,10 +35,6 @@ public class MigratorUnzip implements Migrator {
 		final String folder = removeFileName(config.getChangelogPath());
 		unzip(changelog, folder);
 		migrator.run();
-	}
-
-	private String removeFileName(final String path) {
-		return new File(path).getParentFile().getPath();
 	}
 
 	// https://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/

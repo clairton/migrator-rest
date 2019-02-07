@@ -7,7 +7,7 @@ import org.junit.Test;
 import br.com.caelum.vraptor.test.VRaptorIntegration;
 import br.com.caelum.vraptor.test.http.Parameters;
 
-public class MigratrorControllerTest extends VRaptorIntegration {
+public class MigratrorControllerIntegrationTest extends VRaptorIntegration {
 //	@ClassRule
 //	public static TestRule ruleFixture = new FixtureRule();
 

@@ -1,47 +1,46 @@
 package br.eti.clairton.migrator.rest;
 
-import static java.lang.Long.toHexString;
-import static java.net.URLConnection.guessContentTypeFromName;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.copy;
+import static java.nio.file.Files.readAllBytes;
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Logger.getLogger;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.logging.Logger;
 
 class Uploader {
+	private static final Logger logger = getLogger(Uploader.class.getSimpleName());
+
 	boolean run(final File file, final String url) {
+		// https://blog.morizyun.com/blog/android-httpurlconnection-post-multipart/index.html
+		final String crlf = "\r\n";
+		final String twoHyphens = "--";
 		try {
-			final String boundary = toHexString(System.currentTimeMillis()); // Just generate some unique random value.
-			final String CRLF = "\r\n";
+			final String boundary = "*****";
 			final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			connection.setUseCaches(false);
 			connection.setDoOutput(true);
-			connection.setRequestMethod("PATCH");
-			connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-			final OutputStream output = connection.getOutputStream();
-			final PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, UTF_8), true);
-			writer.append("--" + boundary);
-			writer.append(CRLF);
-			writer.append("Content-Disposition: form-data; filename=\"changelog.zip\"");
-			writer.append(CRLF);
-			writer.append("Content-Type: " + guessContentTypeFromName(file.getName()));
-			writer.append(CRLF);
-			writer.append("Content-Transfer-Encoding: binary");
-			writer.append(CRLF);
-			writer.append(CRLF);
-			writer.flush();
-			copy(file.toPath(), output);
-			output.flush(); // Important before continuing with writer!
-			writer.append(CRLF);
-			writer.flush();
-			writer.append("--" + boundary + "--").append(CRLF).flush();
-			writer.flush();
-			int responseCode = connection.getResponseCode();
-			return responseCode == 200;
+			connection.setDoInput(true);
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Connection", "Keep-Alive");
+			connection.setRequestProperty("Cache-Control", "no-cache");
+			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+			final DataOutputStream output = new DataOutputStream(connection.getOutputStream());
+			output.writeBytes(twoHyphens + boundary + crlf);
+			output.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"changelog.zip\"");
+			output.writeBytes(crlf + crlf);
+			byte[] bytes = readAllBytes(file.toPath());
+			output.write(bytes);
+			output.writeBytes(crlf);
+			output.writeBytes(twoHyphens + boundary + twoHyphens + crlf);
+			output.flush();
+			output.close();
+			int status = connection.getResponseCode();
+			logger.log(INFO, "Http status {0} for {1} address", new Object[] { status, url });
+			return status == 200;
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}

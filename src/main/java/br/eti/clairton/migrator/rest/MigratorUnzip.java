@@ -1,6 +1,8 @@
 package br.eti.clairton.migrator.rest;
 
 import static br.eti.clairton.migrator.rest.Utils.removeFileName;
+import static java.io.File.separator;
+import static java.lang.System.getProperty;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Logger.getLogger;
 
@@ -8,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -27,7 +30,8 @@ public class MigratorUnzip implements Migrator {
 	public MigratorUnzip(final InputStream changelog, final Migrator migrator, final Config config) {
 		this.changelog = changelog;
 		this.migrator = migrator;
-		this.config = config;
+		final String temp = getProperty("java.io.tmpdir") + new Date().getTime() + separator ;
+		this.config = new Config(temp + config.getDataSetPath(), temp + config.getChangelogPath(), config.getSchema());
 	}
 
 	@Override

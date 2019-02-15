@@ -14,7 +14,11 @@ import java.util.logging.Logger;
 class Uploader {
 	private static final Logger logger = getLogger(Uploader.class.getSimpleName());
 
-	boolean run(final File file, final String url) {
+	public boolean run(final File file, final String url) {
+		return run(file, url, "");
+	}
+
+	public boolean run(final File file, final String url, final String token) {
 		// https://blog.morizyun.com/blog/android-httpurlconnection-post-multipart/index.html
 		final String crlf = "\r\n";
 		final String twoHyphens = "--";
@@ -27,6 +31,7 @@ class Uploader {
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Connection", "Keep-Alive");
 			connection.setRequestProperty("Cache-Control", "no-cache");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
 			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 			final DataOutputStream output = new DataOutputStream(connection.getOutputStream());
 			output.writeBytes(twoHyphens + boundary + crlf);

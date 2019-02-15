@@ -30,7 +30,7 @@ public class MigratorUnzip implements Migrator {
 	public MigratorUnzip(final InputStream changelog, final Migrator migrator, final Config config) {
 		this.changelog = changelog;
 		this.migrator = migrator;
-		final String temp = getProperty("java.io.tmpdir") + new Date().getTime() + separator ;
+		final String temp = getProperty("java.io.tmpdir")+ separator + new Date().getTime() + separator ;
 		this.config = new Config(temp + config.getDataSetPath(), temp + config.getChangelogPath(), config.getSchema());
 	}
 

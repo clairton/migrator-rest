@@ -1,38 +1,53 @@
-# migrator [![Build Status](https://travis-ci.org/clairton/repository-http.svg?branch=master)](https://travis-ci.org/clairton/migrator)
-Migração de dados e população de dados iniciais, usando respectivamente liquibase e dbunit. 
-O processo é executado através de uma extensão do CDI. É necessário fornecer uma instancia @Defaul
-de br.eti.clairton.migrator.Config, como por exemplo:
-```java
-@Produces
-public Config getConfig(){
-  System.setProperty("br.eti.clairton.migrator.migrate", "true");
-  System.setProperty("br.eti.clairton.migrator.populate", "true");
-  System.setProperty("br.eti.clairton.migrator.drop", "true");
-  final String diretorioDataSets = "resources/datasets";
-  return new Config(diretorioDataSets);
-}	
-```
-Os dados podem ser inseridos dinamicamente no CSV usado pelo DBUnit, utilizando a marcação ${sql(string sql)} exemplo:
-```csv
-id,nome
-1001,Corretora
-1002,Controladoria
-1003,Financeiro
-1004,${sql(select 'Valor por Sql' from aplicacoes)}
-```
-Na intancia de config pode-se configurar se o liquibase ira deletar o banco antes de aplicar as alterações, e
-se será populado o banco com os changesets. O comportamente pode ser alterado setando as propriedades
-"br.eti.clairton.migrator.populate", "br.eti.clairton.migrator.drop" e "br.eti.clairton.migrator.migrate" 
-ou especializando o Config e personalizando os métodos "isDrop", "isPopulate" e "isMigrate".
+# migrator [![Build Status](https://travis-ci.org/clairton/migrator-rest.svg?branch=master)](https://travis-ci.org/clairton/migrator-rest)
 
-Necessitará fornecer uma instancia de Connection com qualifier @Default.
+Migração de dados, usando o projeto https://github.com/clairton/migrator com HTTP.
+
+Para receber o changelog em uma aplicação:
+
+```java
+@Controller
+@Path("/migrator")
+public class MigratorController extends AbstractMigratorController {
+	private static final long serialVersionUID = -5130409602054807205L;
+
+	@Deprecated
+	public MigratorController() {
+		this(null, null, null);
+	}
+
+	@Inject
+	public MigratorController(final Result result, final Migrator migrator, final Config config) {
+		super(result, migrator, config);
+	}
+}
+```
+
+Para enviar o changelog para uma aplicação:
+
+```java
+@Controller
+@Path("/migrator")
+public class MigratorController extends AbstractMigratorController {
+	private static final long serialVersionUID = -5130409602054807205L;
+
+	@Deprecated
+	public MigratorController() {
+		this(null, null, null);
+	}
+
+	@Inject
+	public MigratorController(final Result result, final Migrator migrator, final Config config) {
+		super(result, migrator, config);
+	}
+}
+```
 
 Download através do maven, dependência:
 ```xml
 <dependency>
-	<groupId>br.eti.clairton</groupId>
-    <artifactId>migrator</artifactId>
-	<version>1.5.0</version>
-	<scope>compile</scope>
+  <groupId>br.eti.clairton</groupId>
+  <artifactId>migrator-rest</artifactId>
+  <version>X.X.X</version>
+  <scope>compile</scope>
 </dependency>
 ```

@@ -27,18 +27,26 @@ public class MigratorRemote implements Migrator {
 	private final Config config;
 	private final Uploader uploader;
 	private final String url;
+	private final String token;
 
-	public MigratorRemote(final Config config, final String url, final Uploader uploader) {
+	public MigratorRemote(Config config, String url, String token) {
+		this(config, url, token, new Uploader());
+	}
+
+	public MigratorRemote(final Config config, final String url, final String token, final Uploader uploader) {
 		this.config = config;
 		this.uploader = uploader;
 		this.url = url;
+		this.token = token;
 	}
 
 	@Override
 	public void run() {
-		final String sourceFolder = removeFileName(config.getChangelogPath());
-		final File changelog = zip(new File(sourceFolder).getAbsolutePath());
-		uploader.run(changelog, url);
+		if (config.isMigrate()) {
+			final String sourceFolder = removeFileName(config.getChangelogPath());
+			final File changelog = zip(new File(sourceFolder).getAbsolutePath());
+			uploader.run(changelog, url, token);
+		}
 	}
 
 	// http://www.mkyong.com/java/how-to-compress-files-in-zip-format/

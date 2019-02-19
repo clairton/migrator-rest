@@ -25,24 +25,16 @@ public class MigratorController extends AbstractMigratorController {
 Para enviar o changelog para uma aplicação:
 
 ```java
-@Controller
-@Path("/migrator")
-public class MigratorController extends AbstractMigratorController {
-	private static final long serialVersionUID = -5130409602054807205L;
-
-	@Deprecated
-	public MigratorController() {
-		this(null, null, null);
-	}
-
-	@Inject
-	public MigratorController(final Result result, final Migrator migrator, final Config config) {
-		super(result, migrator, config);
-	}
-}
+String path = "src/test/resources/db/changelogs/changelog-main.xml";
+Config config = new Config(null, path);
+String address = "http://localhost:8080/auth";
+String token = "123456";
+final Migrator migrator = new MigratorRemote(config, address, token);
+migrator.run();
 ```
 
 Download através do maven, dependência:
+
 ```xml
 <dependency>
   <groupId>br.eti.clairton</groupId>

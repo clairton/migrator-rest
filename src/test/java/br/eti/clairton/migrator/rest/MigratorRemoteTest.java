@@ -17,14 +17,20 @@ public class MigratorRemoteTest {
 	@Test
 	public void testRun() {
 		final String path = "src/test/resources/db/changelogs/changelog-main.xml";
-		final Config config = new Config(null, path);
+		final Config config = new Config(null, path) {
+			@Override
+			public Boolean isMigrate() {
+				return true;
+			}
+		};
 		final String address = "";
+		final String token = "";
 		final Uploader uploader = mock(Uploader.class);
-		final Migrator migrator = new MigratorRemote(config, address, uploader);
+		final Migrator migrator = new MigratorRemote(config, address, token, uploader);
 		migrator.run();
 		final ArgumentCaptor<File> file = ArgumentCaptor.forClass(File.class);
 		final ArgumentCaptor<String> string = ArgumentCaptor.forClass(String.class);
-		verify(uploader).run(file.capture(), string.capture());
+		verify(uploader).run(file.capture(), string.capture(), string.capture());
 		assertTrue(Files.exists(file.getValue().toPath()));
 	}
 }

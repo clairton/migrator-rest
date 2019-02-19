@@ -25,7 +25,16 @@ public abstract class AbstractMigratorController implements Serializable {
 	public AbstractMigratorController(final Result result, final Migrator migrator, final Config config) {
 		this.result = result;
 		this.migrator = migrator;
-		this.config = config;
+		if (config != null) {
+			this.config = new Config(config.getDataSetPath(), config.getChangelogPath(), config.getSchema()) {
+				@Override
+				public Boolean isMigrate() {
+					return true;
+				}
+			};
+		} else {
+			this.config = config;
+		}
 	}
 
 	@Post({ "", "/" })

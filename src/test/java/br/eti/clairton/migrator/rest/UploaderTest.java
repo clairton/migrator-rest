@@ -59,7 +59,8 @@ public class UploaderTest {
 		final Uploader uploader = new Uploader();
 		final File file = new File("src/test/resources/changelogs.zip");
 		final String url = host + "/migrator";
-		assertTrue(uploader.run(file, url));
+		final String token = "123";
+		assertTrue(uploader.run(file, url, token));
 	}
 
 }

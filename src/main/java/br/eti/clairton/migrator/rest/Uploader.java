@@ -2,11 +2,15 @@ package br.eti.clairton.migrator.rest;
 
 import static java.nio.file.Files.readAllBytes;
 import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Logger;
@@ -45,7 +49,18 @@ class Uploader {
 			output.close();
 			int status = connection.getResponseCode();
 			logger.log(INFO, "Http status {0} for {1} address", new Object[] { status, url });
-			return status == 200;
+			final boolean isSuccess = status == 200;
+			if (!isSuccess) {
+				final StringBuffer sb = new StringBuffer();
+				final BufferedInputStream response = new BufferedInputStream(connection.getErrorStream());
+				final BufferedReader br = new BufferedReader(new InputStreamReader(response));
+				String inputLine = "";
+				while ((inputLine = br.readLine()) != null) {
+					sb.append(inputLine);
+				}
+				logger.log(SEVERE, sb.toString());
+			}
+			return isSuccess;
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -29,7 +29,7 @@ public class MigratorRemote implements Migrator {
 	private final String url;
 	private final String token;
 
-	public MigratorRemote(Config config, String url, String token) {
+	public MigratorRemote(final Config config, final String url, final String token) {
 		this(config, url, token, new Uploader());
 	}
 

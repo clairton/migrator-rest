@@ -16,7 +16,7 @@ import br.eti.clairton.migrator.Config;
 import br.eti.clairton.migrator.Migrator;
 
 public abstract class AbstractMigratorController implements Serializable {
-	private static final Logger logger = getLogger(Uploader.class.getSimpleName());
+	private static final Logger logger = getLogger(AbstractMigratorController.class.getSimpleName());
 	private static final long serialVersionUID = -5726623316637519190L;
 	private final Result result;
 	private final Migrator migrator;
@@ -41,7 +41,7 @@ public abstract class AbstractMigratorController implements Serializable {
 	public void run(final UploadedFile file) throws IOException {
 		final InputStream changelog = file.getFile();
 		final Object[] params = new Object[] { file.getFileName(), file.getSize() };
-		logger.log(INFO, "Run migration for file {0} with {1} size", params);
+		logger.log(INFO, "Run migration for file {0} with {1} kbs", params);
 		final Migrator migrator = new MigratorUnzip(changelog, this.migrator, config);
 		migrator.run();
 		result.use(status()).ok();

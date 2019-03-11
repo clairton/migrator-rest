@@ -30,7 +30,7 @@ public class MigratorUnzip implements Migrator {
 	public MigratorUnzip(final InputStream changelog, final Migrator migrator, final Config config) {
 		this.changelog = changelog;
 		this.migrator = migrator;
-		final String temp = getProperty("java.io.tmpdir")+ separator + new Date().getTime() + separator ;
+		final String temp = getProperty("java.io.tmpdir") + separator + new Date().getTime() + separator;
 		this.config = new Config(temp + config.getDataSetPath(), temp + config.getChangelogPath(), config.getSchema());
 	}
 
@@ -43,12 +43,13 @@ public class MigratorUnzip implements Migrator {
 
 	// https://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/
 	private void unzip(final InputStream stream, final String outputFolder) {
+		logger.log(INFO, "Iniciando descompactação para {0}", outputFolder);
 		byte[] buffer = new byte[1024];
 		try {
 			// create output directory is not exists
 			final File folder = new File(outputFolder);
 			if (!folder.exists()) {
-				folder.mkdir();
+				folder.mkdirs();
 			}
 			// get the zip file content
 			final ZipInputStream zis = new ZipInputStream(stream);

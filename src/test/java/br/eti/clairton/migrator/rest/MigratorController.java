@@ -2,8 +2,6 @@ package br.eti.clairton.migrator.rest;
 
 import static br.com.caelum.vraptor.view.Results.status;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 
 import br.com.caelum.vraptor.Controller;
@@ -38,7 +36,7 @@ public class MigratorController extends AbstractMigratorController {
 	}
 
 	@Post({ "", "/" })
-	public void run(final UploadedFile file) throws IOException {
+	public void run(final UploadedFile file) {
 		super.run(file);
 	}
 }

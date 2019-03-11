@@ -2,9 +2,9 @@ package br.eti.clairton.migrator.rest;
 
 import static br.com.caelum.vraptor.view.Results.status;
 import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.logging.Logger;
@@ -38,12 +38,23 @@ public abstract class AbstractMigratorController implements Serializable {
 	}
 
 	@Post({ "", "/" })
-	public void run(final UploadedFile file) throws IOException {
-		final InputStream changelog = file.getFile();
-		final Object[] params = new Object[] { file.getFileName(), file.getSize() };
-		logger.log(INFO, "Run migration for file {0} with {1} kbs", params);
-		final Migrator migrator = new MigratorUnzip(changelog, this.migrator, config);
-		migrator.run();
-		result.use(status()).ok();
+	public void run(final UploadedFile file) {
+		try {
+			final InputStream changelog = file.getFile();
+			if (changelog == null) {
+				logger.log(WARNING, "Arquivo não encontrado, stream esta nulo");
+				result.use(status()).badRequest("Needs a changelog zip file");
+			} else {
+				final Object[] params = new Object[] { file.getFileName(), file.getSize() };
+				logger.log(INFO, "Run migration for file {0} with {1} kbs", params);
+				final Migrator migrator = new MigratorUnzip(changelog, this.migrator, config);
+				migrator.run();
+				result.use(status()).ok();
+			}
+		} catch (final Exception e) {
+			logger.log(WARNING, "Houve um erro ao rodar as migrações", e);
+			final String mensagem = "Houve um erro ao rodar as migrações, verifique os logs para maiores detalhes";
+			result.use(status()).badRequest(mensagem);
+		}
 	}
 }

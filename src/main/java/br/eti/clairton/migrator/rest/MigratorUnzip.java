@@ -4,6 +4,7 @@ import static br.eti.clairton.migrator.rest.Utils.removeFileName;
 import static java.io.File.separator;
 import static java.lang.System.getProperty;
 import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
 
 import java.io.File;
@@ -50,11 +51,18 @@ public class MigratorUnzip implements Migrator {
 			final File folder = new File(outputFolder);
 			if (!folder.exists()) {
 				folder.mkdirs();
+				logger.log(INFO, "Criado pasta {0}", folder.getAbsolutePath());
+			} else {
+				logger.log(INFO, "Já existe pasta {0}", folder.getAbsolutePath());
 			}
 			// get the zip file content
 			final ZipInputStream zis = new ZipInputStream(stream);
 			// get the zipped file list entry
 			ZipEntry ze = zis.getNextEntry();
+			if (stream == null || ze == null) {
+				logger.log(WARNING, "Arquivo não encontrado, stream esta nulo");
+				throw new NullPointerException();
+			}
 			while (ze != null) {
 				final String fileName = ze.getName();
 				final File newFile = new File(outputFolder + File.separator + fileName);

@@ -1,15 +1,12 @@
 package br.eti.clairton.migrator.rest;
 
-import static br.com.caelum.vraptor.view.Results.status;
-
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import br.com.caelum.vraptor.Controller;
-import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.observer.upload.UploadedFile;
 import br.eti.clairton.migrator.Config;
 import br.eti.clairton.migrator.Migrator;
 
@@ -17,26 +14,21 @@ import br.eti.clairton.migrator.Migrator;
 @Path("/migrator")
 public class MigratorController extends AbstractMigratorController {
 	private static final long serialVersionUID = -5130409602054807205L;
-	private final Result result;
 
 	@Deprecated
 	public MigratorController() {
-		this(null, null, null);
+		this(null, null, null, null);
 	}
 
 	@Inject
-	public MigratorController(final Result result, final Migrator migrator, final Config config) {
-		super(result, migrator, config);
-		this.result = result;
+	public MigratorController(final HttpServletRequest request, final Result result, final Migrator migrator,
+			final Config config) {
+		super(request, result, migrator, config);
 	}
 
-	@Get({ "", "/" })
-	public void ping() {
-		result.use(status()).noContent();
-	}
-
+	@Override
 	@Post({ "", "/" })
-	public void run(final UploadedFile file) {
-		super.run(file);
+	public void run() {
+		super.run();
 	}
 }

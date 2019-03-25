@@ -1,12 +1,13 @@
 package br.eti.clairton.migrator.rest;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
 
 import br.com.caelum.vraptor.Controller;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.observer.upload.UploadedFile;
 import br.eti.clairton.migrator.Config;
 import br.eti.clairton.migrator.Migrator;
 
@@ -21,14 +22,13 @@ public class MigratorController extends AbstractMigratorController {
 	}
 
 	@Inject
-	public MigratorController(final HttpServletRequest request, final Result result, final Migrator migrator,
-			final Config config) {
+	public MigratorController(final ServletRequest request, final Result result, final Migrator migrator, final Config config) {
 		super(request, result, migrator, config);
 	}
 
 	@Override
 	@Post({ "", "/" })
-	public void run() {
-		super.run();
+	public void run(final UploadedFile file) {
+		super.run(file);
 	}
 }

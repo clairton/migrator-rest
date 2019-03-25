@@ -23,17 +23,26 @@ public class Compactor {
 
 	public File zip(final Config config) {
 		final String sourceFolder = removeFileName(config.getChangelogPath());
-		return zip(sourceFolder);
+		final File file = new File(sourceFolder);
+		if (!file.exists()) {
+			throw new IllegalStateException("Changelog folder " + file.getAbsolutePath() + " not exist!");
+		}
+		return zip(file.getAbsolutePath());
 	}
 
 	public File zip(final String folder) {
 		// http://www.mkyong.com/java/how-to-compress-files-in-zip-format/
 		try {
+			logger.log(INFO, "Changelog folder to zip: {0}", folder);
 			final File output = createTempFile("changelog", ".zip");
+			logger.log(INFO, "Output to Zip: {0}", output.getAbsolutePath());
 			final Collection<String> files = generateFileList(folder, new ArrayList<>(), new File(folder));
+			if (files.isEmpty()) {
+				throw new IllegalStateException("Folder  " + folder + " is empty!");
+			}
 			final FileOutputStream fileStream = new FileOutputStream(output);
 			final ZipOutputStream zipStream = new ZipOutputStream(fileStream);
-			logger.log(INFO, "Output to Zip: {0}", output);
+			logger.log(INFO, "Output to Zip: {0}", output.getAbsolutePath());
 			byte[] buffer = new byte[1024];
 			for (final String file : files) {
 				logger.log(INFO, "File Added: {0}", file);

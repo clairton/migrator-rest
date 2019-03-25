@@ -1,8 +1,6 @@
 package br.eti.clairton.migrator.rest;
 
 import static br.eti.clairton.migrator.rest.Utils.removeFileName;
-import static java.io.File.separator;
-import static java.lang.System.getProperty;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
@@ -11,7 +9,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -31,19 +28,30 @@ public class MigratorUnzip implements Migrator {
 	public MigratorUnzip(final InputStream changelog, final Migrator migrator, final Config config) {
 		this.changelog = changelog;
 		this.migrator = migrator;
-		final String temp = getProperty("java.io.tmpdir") + separator + new Date().getTime() + separator;
-		this.config = new Config(temp + config.getDataSetPath(), temp + config.getChangelogPath(), config.getSchema());
+		this.config = config;
+//		final String temp = getProperty("java.io.tmpdir") + separator + new Date().getTime() + separator;
+//		final String dataSet = new File(config.getDataSetPath()).getName();
+//		final String changelogMain = new File(config.getChangelogPath()).getName();
+//		this.config = new Config(temp + separator + dataSet, temp + separator + changelogMain, config.getSchema());
+//		final MigratorDefault migratorDefault = (MigratorDefault) migrator;
+//		this.migrator = new MigratorDefault(migratorDefault.getConnection(), config, migratorDefault.getInserter(), migratorDefault.getClassLoader());
 	}
 
 	@Override
 	public void run() {
 		final String folder = removeFileName(config.getChangelogPath());
 		unzip(changelog, folder);
+		final Object[] params = new Object[] { config.getChangelogPath(), config.getDataSetPath() };
+		logger.log(INFO, "Rodando migrator, changelog path: {0}, dataset path: {1}", params);
 		migrator.run();
 	}
 
 	// https://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/
 	private void unzip(final InputStream stream, final String outputFolder) {
+		if (stream == null) {
+			logger.log(WARNING, "Stream esta nulo");
+			throw new NullPointerException();
+		}
 		logger.log(INFO, "Iniciando descompactação para {0}", outputFolder);
 		byte[] buffer = new byte[1024];
 		try {
@@ -55,12 +63,10 @@ public class MigratorUnzip implements Migrator {
 			} else {
 				logger.log(INFO, "Já existe pasta {0}", folder.getAbsolutePath());
 			}
-			// get the zip file content
 			final ZipInputStream zis = new ZipInputStream(stream);
-			// get the zipped file list entry
 			ZipEntry ze = zis.getNextEntry();
 			if (stream == null || ze == null) {
-				logger.log(WARNING, "Arquivo não encontrado, stream esta nulo");
+				logger.log(WARNING, "Não foi possível recuperar o arquivo do .zip");
 				throw new NullPointerException();
 			}
 			while (ze != null) {

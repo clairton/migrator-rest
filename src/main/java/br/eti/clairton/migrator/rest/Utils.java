@@ -4,6 +4,7 @@ import java.io.File;
 
 class Utils {
 	public static String removeFileName(final String path) {
-		return new File(path).getParentFile().getPath();
+		final String parent = new File(path).getParentFile().getPath();
+		return new File(parent).getAbsolutePath();
 	}
 }

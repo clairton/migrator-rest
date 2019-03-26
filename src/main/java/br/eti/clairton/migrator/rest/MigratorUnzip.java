@@ -1,6 +1,8 @@
 package br.eti.clairton.migrator.rest;
 
 import static br.eti.clairton.migrator.rest.Utils.removeFileName;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
@@ -16,7 +18,10 @@ import java.util.zip.ZipInputStream;
 import javax.enterprise.inject.Vetoed;
 
 import br.eti.clairton.migrator.Config;
+import br.eti.clairton.migrator.Inserter;
 import br.eti.clairton.migrator.Migrator;
+import br.eti.clairton.migrator.MigratorDefault;
+import liquibase.Liquibase;
 
 @Vetoed
 public class MigratorUnzip implements Migrator {
@@ -27,14 +32,26 @@ public class MigratorUnzip implements Migrator {
 
 	public MigratorUnzip(final InputStream changelog, final Migrator migrator, final Config config) {
 		this.changelog = changelog;
-		this.migrator = migrator;
-		this.config = config;
-//		final String temp = getProperty("java.io.tmpdir") + separator + new Date().getTime() + separator;
-//		final String dataSet = new File(config.getDataSetPath()).getName();
-//		final String changelogMain = new File(config.getChangelogPath()).getName();
-//		this.config = new Config(temp + separator + dataSet, temp + separator + changelogMain, config.getSchema());
-//		final MigratorDefault migratorDefault = (MigratorDefault) migrator;
-//		this.migrator = new MigratorDefault(migratorDefault.getConnection(), config, migratorDefault.getInserter(), migratorDefault.getClassLoader());
+		this.config = new Config(config.getDataSetPath(), config.getChangelogPath(), config.getSchema()) {
+			@Override
+			public Boolean isDrop() {
+				return FALSE;
+			}
+
+			@Override
+			public Boolean isPopulate() {
+				return FALSE;
+			}
+
+			@Override
+			public Boolean isMigrate() {
+				return TRUE;
+			}
+		};
+		final MigratorDefault migratorDefault = (MigratorDefault) migrator;
+		final Liquibase liquibase = migratorDefault.getLiquibase();
+		final Inserter inserter = migratorDefault.getInserter();
+		this.migrator = new MigratorDefault(liquibase, this.config, inserter);
 	}
 
 	@Override
@@ -50,7 +67,7 @@ public class MigratorUnzip implements Migrator {
 	private void unzip(final InputStream stream, final String outputFolder) {
 		if (stream == null) {
 			logger.log(WARNING, "Stream esta nulo");
-			throw new NullPointerException();
+			throw new IllegalStateException();
 		}
 		logger.log(INFO, "Iniciando descompactação para {0}", outputFolder);
 		byte[] buffer = new byte[1024];

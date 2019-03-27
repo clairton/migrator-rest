@@ -2,4 +2,5 @@
 .project
 .settings/
 target/
+db/
 .DS_Store

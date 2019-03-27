@@ -6,10 +6,14 @@ import static java.util.EnumSet.of;
 import static javax.servlet.DispatcherType.FORWARD;
 import static javax.servlet.DispatcherType.REQUEST;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URI;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -55,12 +59,17 @@ public class UploaderTest {
 	}
 
 	@Test
-	public void testRun() {
+	public void testRun() throws Exception {
 		final Uploader uploader = new Uploader();
 		final File file = new File("src/test/resources/changelogs.zip");
 		final String url = host + "/migrator";
 		final String token = "123";
 		assertTrue(uploader.run(file, url, token));
+		final Connection connection = new Resource().getConnection();
+		final Statement statement = connection.createStatement();
+		final ResultSet result = statement.executeQuery("SELECT COUNT(*) FROM aplicacoes WHERE nome = 'Pass'");
+		result.next();
+		assertEquals(1, result.getInt(1));
 	}
 
 }

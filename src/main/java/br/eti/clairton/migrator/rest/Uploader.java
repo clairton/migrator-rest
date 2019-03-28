@@ -18,11 +18,11 @@ import java.util.logging.Logger;
 class Uploader {
 	private static final Logger logger = getLogger(Uploader.class.getSimpleName());
 
-	public boolean run(final File file, final String url) {
-		return run(file, url, "");
+	public boolean run(final String tenant, final File file, final String url) {
+		return run(tenant, file, url, "");
 	}
 
-	public boolean run(final File file, final String url, final String token) {
+	public boolean run(final String tenant, final File file, final String url, final String token) {
 		// https://blog.morizyun.com/blog/android-httpurlconnection-post-multipart/index.html
 		final String crlf = "\r\n";
 		final String twoHyphens = "--";
@@ -40,9 +40,18 @@ class Uploader {
 			final DataOutputStream output = new DataOutputStream(connection.getOutputStream());
 			output.writeBytes(twoHyphens + boundary + crlf);
 			output.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"changelog.zip\"");
+			output.writeBytes(crlf);
+			output.writeBytes("Content-Type: application/zip");
 			output.writeBytes(crlf + crlf);
 			byte[] bytes = readAllBytes(file.toPath());
 			output.write(bytes);
+			output.writeBytes(crlf);
+			output.writeBytes(twoHyphens + boundary + crlf);
+			output.writeBytes("Content-Disposition: form-data; name=\"path\"");
+			output.writeBytes(crlf);
+			output.writeBytes("Content-Type: text/plain");
+			output.writeBytes(crlf + crlf);
+			output.writeBytes(tenant);
 			output.writeBytes(crlf);
 			output.writeBytes(twoHyphens + boundary + twoHyphens + crlf);
 			output.flush();

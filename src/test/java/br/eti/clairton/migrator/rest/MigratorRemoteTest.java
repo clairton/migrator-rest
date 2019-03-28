@@ -12,14 +12,13 @@ import java.io.IOException;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import br.eti.clairton.migrator.Config;
 import br.eti.clairton.migrator.Migrator;
 
 public class MigratorRemoteTest {
 	@Test
 	public void testRun() throws IOException {
 		final String path = "src/test/resources/db/changelogs/changelog-main.xml";
-		final Config config = new Config(null, path) {
+		final ConfigRest config = new ConfigRest("municipios", null, path) {
 			@Override
 			public Boolean isMigrate() {
 				return true;
@@ -34,7 +33,7 @@ public class MigratorRemoteTest {
 		migrator.run();
 		final ArgumentCaptor<File> file = ArgumentCaptor.forClass(File.class);
 		final ArgumentCaptor<String> string = ArgumentCaptor.forClass(String.class);
-		verify(uploader).run(file.capture(), string.capture(), string.capture());
+		verify(uploader).run(string.capture(), file.capture(), string.capture(), string.capture());
 		assertTrue(exists(file.getValue().toPath()));
 	}
 }

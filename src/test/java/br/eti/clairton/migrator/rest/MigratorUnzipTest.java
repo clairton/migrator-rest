@@ -10,7 +10,6 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import br.eti.clairton.migrator.Config;
 import br.eti.clairton.migrator.Inserter;
 import br.eti.clairton.migrator.Migrator;
 import br.eti.clairton.migrator.MigratorDefault;
@@ -39,7 +38,7 @@ public class MigratorUnzipTest {
 		final String base = "target/changelog-" + new Date().getTime();
 		final String changeLog = base + "/db/changelogs/changelog-main.xml";
 		final String dataSet = base + "/dataset";
-		final Config config = new Config(dataSet, changeLog);
+		final ConfigRest config = new ConfigRest("municipios", dataSet, changeLog);
 		when(defaultMigrator.getConfig()).thenReturn(config);
 		final Migrator migrator = new MigratorUnzip(changelog, defaultMigrator, config);
 		migrator.run();

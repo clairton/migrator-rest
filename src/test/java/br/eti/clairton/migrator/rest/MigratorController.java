@@ -28,7 +28,7 @@ public class MigratorController extends AbstractMigratorController {
 
 	@Override
 	@Post({ "", "/" })
-	public void run(final UploadedFile file) {
-		super.run(file);
+	public void run(final UploadedFile file, final String path) {
+		super.run(file, path);
 	}
 }

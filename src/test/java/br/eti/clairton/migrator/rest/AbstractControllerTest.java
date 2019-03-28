@@ -42,6 +42,6 @@ public class AbstractControllerTest {
 		when(file.getFile()).thenReturn(new FileInputStream(changelog));
 		when(file.getSize()).thenReturn(1l);
 		when(file.getFileName()).thenReturn("changelogs.zip");
-		controller.run(file);
+		controller.run(file, "auth-permissions");
 	}
 }

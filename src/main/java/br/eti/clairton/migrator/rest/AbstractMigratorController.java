@@ -2,6 +2,8 @@ package br.eti.clairton.migrator.rest;
 
 import static br.com.caelum.vraptor.view.Results.status;
 import static java.io.File.createTempFile;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.nio.file.Files.copy;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.logging.Level.INFO;
@@ -31,35 +33,28 @@ public abstract class AbstractMigratorController implements Serializable {
 	private final Config config;
 	private final ServletRequest request;
 
-	public AbstractMigratorController(final ServletRequest request, final Result result, final Migrator migrator,
-			final Config config) {
+	public AbstractMigratorController(final ServletRequest request, final Result result, final Migrator migrator, final Config config) {
 		this.request = request;
 		this.result = result;
 		this.migrator = migrator;
-		if (config != null) {
-			this.config = new Config(config.getDataSetPath(), config.getChangelogPath(), config.getSchema()) {
-				@Override
-				public Boolean isMigrate() {
-					return true;
-				}
-			};
-		} else {
-			this.config = config;
-		}
+		this.config = config;
 	}
 
 	@Post({ "", "/" })
-	public void run(final UploadedFile file) {
+	public void run(final UploadedFile file, final String path) {
 		try {
 			final InputStream changelog;
 			if (file == null || file.getFile() == null) {
-				logger.log(WARNING, "UploadedFile is null, try load from 5request");
+				logger.log(WARNING, "UploadedFile is null, try load from servlet request");
 				final Object param = request.getAttribute("file");
 				if (DefaultUploadedFile.class.isInstance(param)) {
 					changelog = ((UploadedFile) param).getFile();
-				} else {
+				} else if (param != null){
 					final File temp = new File(param.toString());
 					changelog = new FileInputStream(temp);
+				} else {
+					logger.log(WARNING, "File from servlet request is null");
+					changelog = null;
 				}
 			} else {
 				final File temp = createTempFile("changelog", ".zip");
@@ -73,6 +68,22 @@ public abstract class AbstractMigratorController implements Serializable {
 			} else {
 				final Object[] params = new Object[] { file.getFileName(), file.getSize() };
 				logger.log(INFO, "Run migration for file {0} with {1} kbs", params);
+				final ConfigRest config = new ConfigRest(path, this.config.getDataSetPath(), this.config.getChangelogPath(), this.config.getSchema()) {
+					@Override
+					public Boolean isDrop() {
+						return FALSE;
+					}
+
+					@Override
+					public Boolean isPopulate() {
+						return FALSE;
+					}
+
+					@Override
+					public Boolean isMigrate() {
+						return TRUE;
+					}
+				};
 				final Migrator migrator = new MigratorUnzip(changelog, this.migrator, config);
 				migrator.run();
 				result.use(status()).ok();

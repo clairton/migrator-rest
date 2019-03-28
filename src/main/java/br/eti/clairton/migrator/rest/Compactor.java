@@ -66,9 +66,10 @@ public class Compactor {
 		}
 	}
 
-	public void unzip(final InputStream stream, final Config config) {
+	public void unzip(final InputStream stream, final ConfigRest config) {
 		final File folder = removeFileName(config.getChangelogPath());
-		unzip(stream, folder.getAbsolutePath());
+		final File tenant = new File(folder.getPath() + separator + config.getTenant());
+		unzip(stream, tenant.getAbsolutePath());
 	}
 
 	// https://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/

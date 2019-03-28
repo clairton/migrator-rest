@@ -8,27 +8,22 @@ import java.util.logging.Logger;
 
 import javax.enterprise.inject.Vetoed;
 
-import br.eti.clairton.migrator.Config;
 import br.eti.clairton.migrator.Migrator;
 
 @Vetoed
 public class MigratorRemote implements Migrator {
 	private static final Logger logger = getLogger(MigratorRemote.class.getSimpleName());
-	private final Config config;
+	private final ConfigRest config;
 	private final Uploader uploader;
 	private final Compactor compactor;
 	private final String url;
 	private final String token;
 
-	public MigratorRemote(final Config config, final String url, final String token) {
+	public MigratorRemote(final ConfigRest config, final String url, final String token) {
 		this(config, url, token, new Uploader(), new Compactor());
 	}
 
-	public MigratorRemote(
-			final Config config, 
-			final String url, 
-			final String token, 
-			final Uploader uploader,
+	public MigratorRemote(final ConfigRest config, final String url, final String token, final Uploader uploader,
 			final Compactor compactor) {
 		this.config = config;
 		this.uploader = uploader;
@@ -43,7 +38,7 @@ public class MigratorRemote implements Migrator {
 			final File changelog = compactor.zip(config);
 			final Object[] params = new Object[] { changelog.getAbsoluteFile(), changelog.length() };
 			logger.log(INFO, "Uploading file {0} with size {1} kb", params);
-			uploader.run(changelog, url, token);
+			uploader.run(config.getTenant(), changelog, url, token);
 		}
 	}
 }

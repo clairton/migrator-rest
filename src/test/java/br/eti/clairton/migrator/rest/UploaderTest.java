@@ -64,7 +64,7 @@ public class UploaderTest {
 		final File file = new File("src/test/resources/changelogs.zip");
 		final String url = host + "/migrator";
 		final String token = "123";
-		assertTrue(uploader.run(file, url, token));
+		assertTrue(uploader.run("municipios", file, url, token));
 		final Connection connection = new Resource().getConnection();
 		final Statement statement = connection.createStatement();
 		final ResultSet result = statement.executeQuery("SELECT COUNT(*) FROM aplicacoes WHERE nome = 'Pass'");

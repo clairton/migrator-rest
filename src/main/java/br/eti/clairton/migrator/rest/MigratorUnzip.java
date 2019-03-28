@@ -1,7 +1,5 @@
 package br.eti.clairton.migrator.rest;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Logger.getLogger;
 
@@ -10,7 +8,6 @@ import java.util.logging.Logger;
 
 import javax.enterprise.inject.Vetoed;
 
-import br.eti.clairton.migrator.Config;
 import br.eti.clairton.migrator.Inserter;
 import br.eti.clairton.migrator.Migrator;
 import br.eti.clairton.migrator.MigratorDefault;
@@ -21,31 +18,16 @@ public class MigratorUnzip implements Migrator {
 	private static final Logger logger = getLogger(MigratorUnzip.class.getSimpleName());
 	private final InputStream changelog;
 	private final Migrator migrator;
-	private final Config config;
+	private final ConfigRest config;
 	private final Compactor compactor;
 	
-	public MigratorUnzip(final InputStream changelog, final Migrator migrator, final Config config) {
+	public MigratorUnzip(final InputStream changelog, final Migrator migrator, final ConfigRest config) {
 		this(changelog, migrator, config, new Compactor());
 	}
 
-	public MigratorUnzip(final InputStream changelog, final Migrator migrator, final Config config, final Compactor compactor) {
+	public MigratorUnzip(final InputStream changelog, final Migrator migrator, final ConfigRest config, final Compactor compactor) {
 		this.changelog = changelog;
-		this.config = new Config(config.getDataSetPath(), config.getChangelogPath(), config.getSchema()) {
-			@Override
-			public Boolean isDrop() {
-				return FALSE;
-			}
-
-			@Override
-			public Boolean isPopulate() {
-				return FALSE;
-			}
-
-			@Override
-			public Boolean isMigrate() {
-				return TRUE;
-			}
-		};
+		this.config = config;
 		final MigratorDefault migratorDefault = (MigratorDefault) migrator;
 		final Liquibase liquibase = migratorDefault.getLiquibase();
 		final Inserter inserter = migratorDefault.getInserter();

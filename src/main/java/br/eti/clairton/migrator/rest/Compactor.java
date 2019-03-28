@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -24,8 +25,12 @@ public class Compactor {
 	private static final Logger logger = getLogger(Compactor.class.getSimpleName());
 
 	public File zip(final Config config) {
-		final File file = removeFileName(config.getChangelogPath());
-		return zip(file.getAbsolutePath());
+		final String folder = removeFileName(config.getChangelogPath());
+		final URL url = getClass().getClassLoader().getResource(folder);
+		if (url == null) {
+			throw new IllegalStateException("Folder  " + folder + " is not loaded by class loader!");
+		}
+		return zip(url.getPath());
 	}
 
 	public File zip(final String folder) {
@@ -62,13 +67,18 @@ public class Compactor {
 			logger.log(INFO, "Success {0} files added", files.size());
 			return output;
 		} catch (final IOException e) {
+			logger.log(WARNING, "Error on zip changelog", e);
 			throw new RuntimeException(e);
 		}
 	}
 
 	public void unzip(final InputStream stream, final ConfigRest config) {
-		final File folder = removeFileName(config.getChangelogPath());
-		final File tenant = new File(folder.getPath() + separator + config.getTenant());
+		final String folder = removeFileName(config.getChangelogPath());
+		final URL url = getClass().getClassLoader().getResource(folder);
+		if (url == null) {
+			throw new IllegalStateException("Folder  " + folder + " is not loaded by class loader!");
+		}
+		final File tenant = new File(url.getPath() + separator + config.getTenant());
 		unzip(stream, tenant.getAbsolutePath());
 	}
 
@@ -114,6 +124,7 @@ public class Compactor {
 			zis.close();
 			logger.log(INFO, "Finalizado descompatação");
 		} catch (final IOException e) {
+			logger.log(WARNING, "Error on unzip changelog", e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -134,8 +145,8 @@ public class Compactor {
 		return file.substring(sourceFolder.length() + 1, file.length());
 	}
 
-	private File removeFileName(final String path) {
+	private String removeFileName(final String path) {
 		final String parent = new File(path).getParentFile().getPath();
-		return new File(parent);
+		return parent;
 	}
 }

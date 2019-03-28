@@ -183,18 +183,6 @@
 			<version>9.4.14.v20181114</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency> <groupId>org.apache.deltaspike.modules</groupId> <artifactId>deltaspike-test-control-module-api</artifactId> 
-			<version>${deltaspike.version}</version> <scope>test</scope> </dependency> 
-			<dependency> <groupId>org.apache.deltaspike.modules</groupId> <artifactId>deltaspike-test-control-module-impl</artifactId> 
-			<version>${deltaspike.version}</version> <scope>test</scope> </dependency> 
-			<dependency> <groupId>org.apache.deltaspike.cdictrl</groupId> <artifactId>deltaspike-cdictrl-weld</artifactId> 
-			<version>${deltaspike.version}</version> <scope>test</scope> </dependency> 
-			<dependency> <groupId>org.mockito</groupId> <artifactId>mockito-all</artifactId> 
-			<version>1.10.8</version> <scope>test</scope> </dependency> <dependency> 
-			<groupId>org.slf4j</groupId> <artifactId>slf4j-log4j12</artifactId> <version>1.7.9</version> 
-			<scope>test</scope> </dependency> <dependency> <groupId>org.jboss</groupId> 
-			<artifactId>jboss-vfs</artifactId> <version>3.2.9.Final</version> <scope>test</scope> 
-			</dependency> -->
 	</dependencies>
 	<profiles>
 		<profile>

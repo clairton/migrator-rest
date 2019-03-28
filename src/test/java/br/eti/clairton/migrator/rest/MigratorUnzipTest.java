@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Date;
 
 import org.junit.Test;
 
@@ -35,9 +34,8 @@ public class MigratorUnzipTest {
 		when(liquibase.getResourceAccessor()).thenReturn(accessor);
 		when(defaultMigrator.getLiquibase()).thenReturn(liquibase);
 		final InputStream changelog = new FileInputStream(new File("src/test/resources/changelogs.zip"));
-		final String base = "target/changelog-" + new Date().getTime();
-		final String changeLog = base + "/db/changelogs/changelog-main.xml";
-		final String dataSet = base + "/dataset";
+		final String changeLog = "db/changelogs/changelog-main.xml";
+		final String dataSet = "dataset";
 		final ConfigRest config = new ConfigRest("municipios", dataSet, changeLog);
 		when(defaultMigrator.getConfig()).thenReturn(config);
 		final Migrator migrator = new MigratorUnzip(changelog, defaultMigrator, config);

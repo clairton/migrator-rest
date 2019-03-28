@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Logger;
 
-class Uploader {
+public class Uploader {
 	private static final Logger logger = getLogger(Uploader.class.getSimpleName());
 
 	public boolean run(final String tenant, final File file, final String url) {

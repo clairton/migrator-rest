@@ -6,12 +6,14 @@ import java.io.File;
 
 import org.junit.Test;
 
+import br.eti.clairton.migrator.Config;
+
 public class CompactorTest {
 	@Test
-	public void testRun() {
-		final String path = new File("src/test/resources/db/changelogs").getAbsolutePath();
+	public void testZip() {
+		final Config config = new ConfigRest(null, null, "db/changelogs/changelog-1.0.0.xml");
 		final Compactor compactor = new Compactor();
-		final File zip = compactor.zip(path);
+		final File zip = compactor.zip(config);
 		assertNotNull(zip.length());
 	}
 }

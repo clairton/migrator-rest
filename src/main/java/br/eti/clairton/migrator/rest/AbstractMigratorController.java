@@ -2,8 +2,10 @@ package br.eti.clairton.migrator.rest;
 
 import static br.com.caelum.vraptor.view.Results.status;
 import static java.io.File.createTempFile;
+import static java.io.File.separator;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.System.getProperty;
 import static java.nio.file.Files.copy;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.logging.Level.INFO;
@@ -41,7 +43,7 @@ public abstract class AbstractMigratorController implements Serializable {
 	}
 
 	@Post({ "", "/" })
-	public void run(final UploadedFile file, final String path) {
+	public void run(final UploadedFile file, final String tenant) {
 		try {
 			final InputStream changelog;
 			if (file == null || file.getFile() == null) {
@@ -68,6 +70,8 @@ public abstract class AbstractMigratorController implements Serializable {
 			} else {
 				final Object[] params = new Object[] { file.getFileName(), file.getSize() };
 				logger.log(INFO, "Run migration for file {0} with {1} kbs", params);
+				final String path = getProperty("java.io.tmpdir") + separator + tenant;
+				logger.log(INFO, "Class path tenant for changelogs {0}", path);
 				final ConfigRest config = new ConfigRest(path, this.config.getDataSetPath(), this.config.getChangelogPath(), this.config.getSchema()) {
 					@Override
 					public Boolean isDrop() {

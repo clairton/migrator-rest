@@ -47,7 +47,7 @@ public class Uploader {
 			output.write(bytes);
 			output.writeBytes(crlf);
 			output.writeBytes(twoHyphens + boundary + crlf);
-			output.writeBytes("Content-Disposition: form-data; name=\"path\"");
+			output.writeBytes("Content-Disposition: form-data; name=\"tenant\"");
 			output.writeBytes(crlf);
 			output.writeBytes("Content-Type: text/plain");
 			output.writeBytes(crlf + crlf);

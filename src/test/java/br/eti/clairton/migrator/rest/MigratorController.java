@@ -22,13 +22,13 @@ public class MigratorController extends AbstractMigratorController {
 	}
 
 	@Inject
-	public MigratorController(final ServletRequest request, final Result result, final Migrator migrator, final Config config) {
+	public MigratorController(final ServletRequest request, final Result result, final Migrator migrator, @Rest final Config config) {
 		super(request, result, migrator, config);
 	}
 
 	@Override
 	@Post({ "", "/" })
-	public void run(final UploadedFile file, final String path) {
-		super.run(file, path);
+	public void run(final UploadedFile file, final String tenant) {
+		super.run(file, tenant);
 	}
 }

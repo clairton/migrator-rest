@@ -73,13 +73,8 @@ public class Compactor {
 	}
 
 	public void unzip(final InputStream stream, final ConfigRest config) {
-		final String folder = removeFileName(config.getChangelogPath());
-		final URL url = getClass().getClassLoader().getResource(folder);
-		if (url == null) {
-			throw new IllegalStateException("Folder  " + folder + " is not loaded by class loader!");
-		}
-		final File tenant = new File(url.getPath() + separator + config.getTenant());
-		unzip(stream, tenant.getAbsolutePath());
+		final String folder = config.getTenant() + separator + removeFileName(config.getChangelogPath());
+		unzip(stream, new File(folder).getAbsolutePath());
 	}
 
 	// https://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/

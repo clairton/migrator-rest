@@ -54,6 +54,11 @@ public class MigratorUnzip implements Migrator {
 	private static Liquibase getLiquibase(final ConfigRest config, final Liquibase original) {
 		try {
 			final File file = new File(config.getTenant());
+			if (!file.exists()) {
+				if (!file.mkdirs()) {
+					throw new RuntimeException("Não foi possível criar o diretorio " + file.getAbsolutePath());
+				}
+			}
 			final URL url = file.toURI().toURL();
 			logger.log(INFO, "Adicionando {0} ao class loader para liquibase carregar changelogs", url);
 			final URL[] urls = new URL[] { url };

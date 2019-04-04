@@ -70,6 +70,7 @@ public abstract class AbstractMigratorController implements Serializable {
 			} else {
 				final Object[] params = new Object[] { file.getFileName(), file.getSize() };
 				logger.log(INFO, "Run migration for file {0} with {1} kbs", params);
+//				final String path = getProperty("user.home") + separator + "changelogs" + separator + tenant;
 				final String path = getProperty("java.io.tmpdir") + separator + tenant;
 				logger.log(INFO, "Class path tenant for changelogs {0}", path);
 				final ConfigRest config = new ConfigRest(path, this.config.getDataSetPath(), this.config.getChangelogPath(), this.config.getSchema()) {

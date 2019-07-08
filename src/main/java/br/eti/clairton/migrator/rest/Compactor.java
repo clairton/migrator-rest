@@ -16,6 +16,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -43,7 +45,7 @@ public class Compactor {
 //		}
 		// http://www.mkyong.com/java/how-to-compress-files-in-zip-format/
 		try {
-			logger.log(INFO, "Changelog folder to zip: {0}", folder);
+			logger.log(INFO, "Changelog url to zip: {0}", folder);
 			final File output = createTempFile("changelog", ".zip");
 			logger.log(INFO, "Output to Zip: {0}", output.getAbsolutePath());
 			final Collection<URL> files = generateFileList(new ArrayList<>(), folder);
@@ -107,7 +109,7 @@ public class Compactor {
 			}
 			while (ze != null) {
 				final String fileName = ze.getName();
-				final File newFile = new File(outputFolder + File.separator + fileName);
+				final File newFile = new File(outputFolder + separator + fileName);
 				logger.log(INFO, "Descompactando {0}", newFile.getAbsoluteFile());
 				// create all non exists folders
 				// else you will hit FileNotFoundException for compressed folder
@@ -131,26 +133,46 @@ public class Compactor {
 
 	private Collection<URL> generateFileList(final Collection<URL> files, final URL node) {
 		try {
-			if (new File(node.getFile()).isFile()) {
+			if (node.toString().endsWith(".xml")) {
+				logger.log(INFO, "Is file: " + node);
 				files.add(node);
 			} else {
+				logger.log(INFO, "Get files in : " + node);
 				final URLConnection conn = node.openConnection();
 				final InputStream inputStream = conn.getInputStream();
-				final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+				final Collection<String> paths = new ArrayList<>();
+				if (inputStream instanceof JarInputStream) {
+					final JarInputStream jarStream = (JarInputStream) inputStream;
+					while (true) {
+						final JarEntry entry = jarStream.getNextJarEntry();
+						if (entry == null) {
+							break;
+						} else if (!entry.isDirectory()) {
+							paths.add(entry.toString());
+						}
+					}
+				} else {
+					logger.log(INFO, "Stream: " + inputStream);
+					final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+					String line;
+					while ((line = reader.readLine()) != null) {
+						paths.add(line);
+					}
+					reader.close();
+				}
 				final Collection<URL> children = new ArrayList<>();
-				String line;
-				while ((line = reader.readLine()) != null) {
-					final String string = node.getProtocol() + ":" + node.getFile() + separator + line;
+				for (final String path : paths) {
+					final String string = (node.getProtocol() + ":" + node.getFile() + separator + path)
+							.replaceAll("//", "/");
 					logger.log(INFO, "Found url: " + string);
 					final URL url = new URL(string);
 					children.add(url);
 				}
-				reader.close();
 				for (final URL file : children) {
 					generateFileList(files, file);
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 		return files;
